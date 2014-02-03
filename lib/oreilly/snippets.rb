@@ -1,21 +1,41 @@
 require "oreilly/snippets/version"
 
+COMMENTS = {
+  js: "//",
+  ruby: "#"
+}
+
 module Oreilly
   module Snippets
+
+    def self.get_content_from_file( filename, identifier, language )
+      contents = File.read( filename )
+      m = contents.match( /#{COMMENTS[language]} BEGIN #{identifier}\n(.*?)#{COMMENTS[language]} END #{identifier}/xm )
+      m[0]
+    end
+    
     def self.process( input, filename, language=nil, identifier=nil )
-      input
+      snippets = parse( input )
+      rv = input
+      if snippets and snippets.length > 0 
+        snippets.each do |s|
+          content = get_content_from_file( filename, s[:identifier], s[:language] )
+          # rv.gsub( /
+        end
+      end
     end
     
     def self.parse( input, offset=nil )
       output = []
-      input.scan( /\[([^=]*)="([^"]*)",\s*([^=]*)="([^"]*)",\s*([^=]*)="([^"]*)"\]\n(.*)\n(.*)\n\7/mx ) do |m|
+      input.scan( /\[([^=]*)(=")([^"]*)(",\s*)([^=]*)(=")([^"]*)(",\s*)([^=]*)(=")([^"]*)(")\](\s+snippet.*?\n)(.*)\13/mx ) do |m|
+        # /\[([^=]*)(=")([^"]*)(",\s*)([^=]*)(=")([^"]*)(",\s*)([^=]*)(=")([^"]*)(")\](.*)\7/mx ) do |m|
         match = {}
-        3.times do |i|
-          match[m[i*2].to_sym] = m[(i*2)+1]
-        end
-        
-        match[:snippet] = m[6]
-        match[:throwaway] = m[7]
+        match[m[0].to_sym] = m[2]
+        match[m[4].to_sym] = m[6]
+        match[m[8].to_sym] = m[10]
+        match[:snippet] = m[12].strip
+        match[:throwaway] = m[13]
+        match[:full] = ( "[" + m[0..11].join( "" ) + "]" ) + m[12..-1].join( "" ) + m[12]
         
         output << match
       end

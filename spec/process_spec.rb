@@ -1,14 +1,18 @@
 require 'spec_helper'
 
-TEMPLATE = <<END
-
-ABC
-
+FULL = <<END
 [filename="fixtures/factorial.js", language="js", identifier="FACTORIAL_FUNC"]
 snippet~~~~
 Put any descriptive text you want here. It will be replaced with the
 specified code snippet when you build ebook outputs
 snippet~~~~
+END
+
+TEMPLATE = <<END
+
+ABC
+
+#{FULL}
 
 DEF
 
@@ -24,6 +28,7 @@ describe "#parse" do
     output[:identifier].should == "FACTORIAL_FUNC"
     output[:throwaway].should match( /^Put any descriptive/ )
     output[:snippet].should == "snippet~~~~"
+    output[:full].should == FULL
   end
 end
 
@@ -33,6 +38,9 @@ describe "#process" do
     output = Oreilly::Snippets.process( TEMPLATE, "fixtures/", "asdas" )
     output.should match( /ABC/ )
     output.should match( /DEF/ )
+    output.should match( /function factorial\(number\)/ )
+    output.should_not match( /BEGIN FACTORIAL FUNC/ )
+    output.should_not match( /END FACTORIAL FUNC/ ) 
   end
 
 end
