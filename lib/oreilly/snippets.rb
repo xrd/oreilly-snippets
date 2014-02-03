@@ -10,34 +10,36 @@ module Oreilly
 
     def self.get_content_from_file( filename, identifier, language )
       contents = File.read( filename )
-      m = contents.match( /#{COMMENTS[language]} BEGIN #{identifier}\n(.*?)#{COMMENTS[language]} END #{identifier}/xm )
+      m = contents.match( /#{COMMENTS[language]} BEGIN #{identifier}\n(.*?)#{COMMENTS[language]} END #{identifier}/m )
       m[0]
     end
     
-    def self.process( input, filename, language=nil, identifier=nil )
+    def self.process( input )
       snippets = parse( input )
       rv = input
       if snippets and snippets.length > 0 
         snippets.each do |s|
-          content = get_content_from_file( filename, s[:identifier], s[:language] )
-          # rv.gsub( /
+          content = get_content_from_file( s[:filename], s[:identifier], s[:language] )
+          rv = rv.gsub( s[:full], content )
         end
       end
+      rv
     end
     
-    def self.parse( input, offset=nil )
+    def self.parse( input )
       output = []
-      input.scan( /\[([^=]*)(=")([^"]*)(",\s*)([^=]*)(=")([^"]*)(",\s*)([^=]*)(=")([^"]*)(")\](\s+snippet.*?\n)(.*)\13/mx ) do |m|
-        # /\[([^=]*)(=")([^"]*)(",\s*)([^=]*)(=")([^"]*)(",\s*)([^=]*)(=")([^"]*)(")\](.*)\7/mx ) do |m|
-        match = {}
-        match[m[0].to_sym] = m[2]
-        match[m[4].to_sym] = m[6]
-        match[m[8].to_sym] = m[10]
-        match[:snippet] = m[12].strip
-        match[:throwaway] = m[13]
-        match[:full] = ( "[" + m[0..11].join( "" ) + "]" ) + m[12..-1].join( "" ) + m[12]
-        
-        output << match
+      input.scan( /(\[[^\]]*\])(\s+)(snippet[^\s]*)(.*?)\3/m ) do |m|
+        # Add it all up, and include the snippet piece (second to last captured)
+        full = m.join( "" ) + m[m.length-2]
+        full.scan( /\[([^=]*)="([^"]*)",\s*([^=]*)="([^"]*)",\s*([^=]*)="([^"]*)"\]/m ) do |m2|
+          match = {}
+          3.times do |i|
+            match[m2[i*2].to_sym] = m2[(i*2)+1]
+          end
+
+          match[:full] = full.strip
+          output << match
+        end
       end
       output
     end
