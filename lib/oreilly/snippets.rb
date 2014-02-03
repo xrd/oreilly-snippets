@@ -11,9 +11,9 @@ module Oreilly
     def self.get_content_from_file( filename, identifier, language )
       contents = File.read( filename )
       m = contents.match( /#{COMMENTS[language]} BEGIN #{identifier}\n(.*?)#{COMMENTS[language]} END #{identifier}/m )
-      m[0]
+      m[1]
     end
-    
+
     def self.process( input )
       snippets = parse( input )
       rv = input

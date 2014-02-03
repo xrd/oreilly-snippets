@@ -22,7 +22,7 @@ WRAPPED_BY_SOURCE = <<END
 
 [source,javascript]
 -----
-[filename="../github.js.test/coffeetech.js", language="js", identifier="MODULE_DEFINITION"]
+[filename="spec/fixtures/coffeetech.js", language="js", identifier="MODULE_DEFINITION"]
 snippet~~~~~
 var mod = angular.module( 'coffeetech', [] )
 mod.controller( 'GithubCtrl', function( $scope ) {
@@ -43,7 +43,7 @@ describe "#parse" do
   it "should parse wrapped items" do
     outputs = Oreilly::Snippets.parse( WRAPPED_BY_SOURCE )
     output = outputs[0]
-    output[:filename].should == "../github.js.test/coffeetech.js"
+    output[:filename].should == "spec/fixtures/coffeetech.js"
     output[:language].should == "js"
     output[:identifier].should == "MODULE_DEFINITION"
   end
@@ -60,13 +60,18 @@ end
 
 describe "#process" do
 
+  it "should process a complex file" do
+    output = Oreilly::Snippets.process( WRAPPED_BY_SOURCE )
+    output.should_not match( /MODULE_DEFINITION/ )
+  end
+  
   it "should process a simple file" do
     output = Oreilly::Snippets.process( TEMPLATE )
     output.should match( /ABC/ )
     output.should match( /DEF/ )
     output.should match( /function factorial\(number\)/ )
-    output.should_not match( /BEGIN FACTORIAL FUNC/ )
-    output.should_not match( /END FACTORIAL FUNC/ ) 
+    output.should_not match( /BEGIN FACTORIAL_FUNC/ )
+    output.should_not match( /END FACTORIAL_FUNC/ ) 
   end
 
 end
