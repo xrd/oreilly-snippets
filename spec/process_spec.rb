@@ -63,6 +63,7 @@ describe "#process" do
   it "should process a complex file" do
     output = Oreilly::Snippets.process( WRAPPED_BY_SOURCE )
     output.should_not match( /MODULE_DEFINITION/ )
+    output.should_not match( /\/\/$/ )
   end
   
   it "should process a simple file" do

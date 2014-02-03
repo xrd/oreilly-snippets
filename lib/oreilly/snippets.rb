@@ -1,8 +1,8 @@
 require "oreilly/snippets/version"
 
 COMMENTS = {
-  js: "//",
-  ruby: "#"
+  :js => "\/\/",
+  :ruby => "#"
 }
 
 module Oreilly
@@ -10,7 +10,9 @@ module Oreilly
 
     def self.get_content_from_file( filename, identifier, language )
       contents = File.read( filename )
-      m = contents.match( /#{COMMENTS[language]} BEGIN #{identifier}\n(.*?)#{COMMENTS[language]} END #{identifier}/m )
+      comments = COMMENTS[language.to_sym]
+      re = /#{comments} BEGIN #{identifier}\n(.*)\n#{comments} END #{identifier}\n/m
+      m = contents.match( re )
       m[1]
     end
 
