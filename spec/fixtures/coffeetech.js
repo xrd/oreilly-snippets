@@ -17,3 +17,9 @@ mod.controller( 'GithubCtrl', [ '$scope', 'Github', 'Geo', function( $scope, ghs
         $scope.getCurrentLocation( function( position ) {
             $scope.latitude = position.coords.latitude;
             $scope.longitude = position.coords.longitude;
+
+// BEGIN FOOBAR
+
+alert( "Something" );
+
+// END FOOBAR

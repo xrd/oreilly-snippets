@@ -29,9 +29,18 @@ module Oreilly
       else
         rv = contents
       end
+
+      # rv = scrub_other_identifiers( contents, comments )
       rv
     end
 
+    def self.scrub_other_identifiers( s, comments )
+      puts s
+      re = /#{comments} BEGIN \S+\n(.*)\n#{comments} END \S+\n/m
+      s.gsub!( re, $1 )
+      s
+    end
+    
     def self.process( input )
       snippets = parse( input )
       rv = input

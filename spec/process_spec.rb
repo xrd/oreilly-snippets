@@ -19,6 +19,17 @@ mod.controller( 'ShopsCtrl', function( $scope ) {
 })
 END
 
+LOTS_OF_IDENTIFIERS = <<END
+
+[filename="spec/fixtures/coffeetech.js", language="js"]
+snippet~~~~
+Put any descriptive text you want here. It will be replaced with the
+specified code snippet when you build ebook outputs
+snippet~~~~
+
+END
+
+
 FULL = <<END
 [filename="spec/fixtures/factorial.js", language="js", identifier="FACTORIAL_FUNC"]
 snippet~~~~
@@ -83,6 +94,13 @@ describe "#parse" do
   end
 end
 
+# describe "#scrub_other_identifiers" do
+#   it "should scrub everything that looks like an identifier" do
+#     out = Oreilly::Snippets.scrub_other_identifiers( File.read( "spec/fixtures/coffeetech.js" ), "//" )
+#     out.should_not match( /FOOBAR/ )
+#   end
+# end
+
 describe "#process" do
 
   it "should process a complex file" do
@@ -100,6 +118,12 @@ describe "#process" do
     output.should_not match( /END FACTORIAL_FUNC/ ) 
   end
 
+  # NYI
+  # it "should remove all identifiers when processing" do
+  #   output = Oreilly::Snippets.process( LOTS_OF_IDENTIFIERS )
+  #   output.should_not match( /BEGIN/ )
+  # end
+  
   describe "#git" do
     it "should retrieve by SHA if specified" do
       output = Oreilly::Snippets.process( WITH_SHA )
