@@ -8,12 +8,28 @@ COMMENTS = {
 module Oreilly
   module Snippets
 
-    def self.get_content_from_file( filename, identifier, language )
-      contents = File.read( filename )
-      comments = COMMENTS[language.to_sym]
-      re = /#{comments} BEGIN #{identifier}\n(.*)\n#{comments} END #{identifier}\n/m
-      m = contents.match( re )
-      m[1]
+    def self.get_content_from_file( spec, identifier, language, sha=nil )
+      contents = nil
+      if sha
+        # Use the filename to change into the directory and use git-show
+        cwd = Dir.pwd
+        Dir.chdir spec
+        contents = `git show #{sha}`
+        Dir.chdir cwd
+      else
+        contents = File.read( spec )
+      end
+
+      rv = nil
+      if identifier
+        comments = COMMENTS[language.to_sym]
+        re = /#{comments} BEGIN #{identifier}\n(.*)\n#{comments} END #{identifier}\n/m
+        m = contents.match( re )
+        rv = m[1]
+      else
+        rv = contents
+      end
+      rv
     end
 
     def self.process( input )
@@ -21,7 +37,7 @@ module Oreilly
       rv = input
       if snippets and snippets.length > 0 
         snippets.each do |s|
-          content = get_content_from_file( s[:filename], s[:identifier], s[:language] )
+          content = get_content_from_file( s[:filename], s[:identifier], s[:language], s[:sha] )
           rv = rv.gsub( s[:full], content )
         end
       end
@@ -33,15 +49,12 @@ module Oreilly
       input.scan( /(\[[^\]]*\])(\s+)(snippet[^\s]*)(.*?)\3/m ) do |m|
         # Add it all up, and include the snippet piece (second to last captured)
         full = m.join( "" ) + m[m.length-2]
-        full.scan( /\[([^=]*)="([^"]*)",\s*([^=]*)="([^"]*)",\s*([^=]*)="([^"]*)"\]/m ) do |m2|
-          match = {}
-          3.times do |i|
-            match[m2[i*2].to_sym] = m2[(i*2)+1]
-          end
-
-          match[:full] = full.strip
-          output << match
+        match = {}
+        m[0].scan( /([^=\[,\s]*)="([^"]*)"/ ) do |kv|
+          match[kv[0].to_sym] = kv[1]
         end
+        match[:full] = full.strip
+        output << match
       end
       output
     end
