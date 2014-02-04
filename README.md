@@ -161,7 +161,9 @@ run app
 
 Install the `rspec` gem.
 
+```
 $ rspec 
+```
 
 ## Contributing
 
