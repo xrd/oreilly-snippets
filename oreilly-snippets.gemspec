@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Oreilly::Snippets::VERSION
   spec.authors       = ["Chris Dawson"]
   spec.email         = ["xrdawson@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{Use O'Reilly style snippets inside your markup (asciidoc or markdown) files}
+  spec.summary       = %q{See the README}
   spec.homepage      = ""
   spec.license       = "MIT"
 
