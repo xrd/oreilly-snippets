@@ -81,6 +81,12 @@ directory, then grab the file at the specific SHA hash. This means you
 can write code inside a repository, and add a snippet pointing to that
 exact revision in the repository.
 
+Also, you can specify line numbers and use just certain lines within the file retrieved:
+
+```
+[filename="../../github.js.test", language="js", sha="8e05a916fe0b1a9d3e:coffeetech.js:1..5"]
+```
+
 NB: This format of snippets is not currently compatible with Atlas
 from O'Reilly. However, you can always process the snippet and write
 out a normal Asciidoc file, a file which will be compatible with
