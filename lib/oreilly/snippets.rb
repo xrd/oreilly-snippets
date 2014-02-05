@@ -10,16 +10,32 @@ module Oreilly
 
     def self.get_content_from_file( spec, identifier, language, sha=nil )
       contents = nil
+      line_numbers = nil
+
       if sha
+
+        if sha.count( ":" ) > 1
+          # Strip off the line numbers and use them later
+          first = sha.index ":"
+          second = (sha.index ":", first+1)+1
+          numbers = sha[second..-1]
+          sae = numbers.split( ".." ).map { |d| Integer(d) }
+          sha = sha[0..second-2]
+          line_numbers = [sae[0], sae[1]]
+        end
         # Use the filename to change into the directory and use git-show
         cwd = Dir.pwd
         Dir.chdir spec if spec
         contents = `git show #{sha}`
         Dir.chdir cwd if spec
+        
       else
         contents = File.read( spec )
       end
 
+      # If line numbers are there, provide only that content
+      contents = contents.split( /\n/ )[line_numbers[0]..line_numbers[1]].join( "\n" ) if line_numbers
+      
       rv = nil
       if identifier
         comments = COMMENTS[language.to_sym]

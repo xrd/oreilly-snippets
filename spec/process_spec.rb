@@ -13,6 +13,13 @@ Put any descriptive text you want here. It will be replaced with the
 snippet~~~~
 END
 
+WITH_SHA_LINE_NUMBERS = <<END
+[filename="#{ROOT}", language="js", sha="c863f786f5959799d7c:test.js:1..3"]
+snippet~~~~
+Put any descriptive text you want here. It will be replaced with the
+snippet~~~~
+END
+
 ORIGINAL_CONTENTS = <<END
 var mod = angular.module( 'coffeetech', [] )
 mod.controller( 'ShopsCtrl', function( $scope ) {
@@ -146,10 +153,22 @@ describe Oreilly::Snippets do
       it "should retrieve by SHA if specified" do
         output = Oreilly::Snippets.process( WITH_SHA )
         # strip the whitespace, makes comparison easier..
-        out = output.gsub( /\s+/, '' )
-        original = ORIGINAL_CONTENTS.gsub( /\s+/, '' )
-        puts "#{out} vs. #{original}"
-        out.should == original
+        cwd = Dir.getwd
+        Dir.chdir File.join( ROOT )
+        original = `git show c863f786f5959799d7c11312a7ba1d603ff16339:test.js`
+        Dir.chdir cwd
+        output.strip.should == original.strip
+      end
+
+      it "should retrieve by SHA and give us only certain lines" do
+        output = Oreilly::Snippets.process( WITH_SHA_LINE_NUMBERS )
+        cwd = Dir.getwd
+        Dir.chdir File.join( ROOT )
+        original = `git show c863f786f5959799d7c11312a7ba1d603ff16339:test.js`
+        Dir.chdir cwd
+        lines = original.split /\n/
+        original = lines[1..3].join "\n"
+        output.strip.should == original.strip
       end
     end
     
