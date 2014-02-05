@@ -104,14 +104,17 @@ The file structure I use for this:
 * Store my pre-processed files in the /pre directory. These are the
   files which have the snippets. I need to have a special directory
   because this means Atlas will ignore them, and guard will process
-  the files into the Asciidoc files used by Atlas.
+  the files into the Asciidoc files stored in the root of the directory, 
+  the files which Atlas will process.
 * In the directory root I have a bunch of .asciidoc files which are
   the post-processed files, the files which have the snippets resolved
   into real code.
-* Guard watches both directories. When I make a change to the files in
+* Guard watches both directories (the root and the /pre directory). 
+  When I make a change to the files in
   /pre, Guard regenerates the asciidoc files at the top level. When
   Guard sees one of those files has been changed, it processes them
-  through Asciidoctor and then builds the HTML. 
+  through Asciidoctor and then builds the HTML. You could combine these 
+  into a single watch if you want.
 * I serve the HTML file using a combination of pow (pow.cx) and
   config.ru. 
 * Use the live-reload plugin for Chrome:
