@@ -18,6 +18,12 @@ Or install it yourself as:
 
 ## Usage
 
+### Library usage
+
+Send a string with proper snippet code into the process method:
+
+`Oreilly::Snippets.process( asciidoc_string )`
+
 ### Snippets Usage
 
 Check out (Code Snippets)[http://chimera.labs.oreilly.com/books/1230000000065/ch04.html#code_explanation]
