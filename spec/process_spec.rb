@@ -1,7 +1,13 @@
 require 'spec_helper'
+require 'fileutils'
+require 'tempfile'
+
+TEST_REPO = "oreilly-snippets-sample-content"
+GITHUB_REPO = "https://github.com/xrd/#{TEST_REPO}.git"
+ROOT = File.join "spec", TEST_REPO
 
 WITH_SHA = <<END
-[filename="../../github.js.test", language="js", sha="8e05a916fe0b1a9d3e:coffeetech.js"]
+[filename="#{ROOT}", language="js", sha="c863f786f5959799d7c:test.js"]
 snippet~~~~
 Put any descriptive text you want here. It will be replaced with the
 snippet~~~~
@@ -68,67 +74,84 @@ snippet~~~~~
 
 END
 
-describe "#parse" do
-
-  it "should parse wrapped items" do
-    outputs = Oreilly::Snippets.parse( WRAPPED_BY_SOURCE )
-    output = outputs[0]
-    output[:filename].should == "spec/fixtures/coffeetech.js"
-    output[:language].should == "js"
-    output[:identifier].should == "MODULE_DEFINITION"
-  end
-  
-  it "should parse the file and extract the correct things" do
-    outputs = Oreilly::Snippets.parse( TEMPLATE )
-    output = outputs[0]
-    output[:filename].should == "spec/fixtures/factorial.js"
-    output[:language].should == "js"
-    output[:identifier].should == "FACTORIAL_FUNC"
-    output[:full].strip.should == FULL.strip
-  end
-
-  it "should get the SHA when specified" do
-    outputs = Oreilly::Snippets.parse( WITH_SHA )
-    output = outputs[0]
-    output[:sha].should == "8e05a916fe0b1a9d3e:coffeetech.js"
+def download_test_repository
+  root = File.join( "spec", TEST_REPO )
+  unless File.exists? root
+    `git clone #{GITHUB_REPO} #{root}`
   end
 end
 
-# describe "#scrub_other_identifiers" do
-#   it "should scrub everything that looks like an identifier" do
-#     out = Oreilly::Snippets.scrub_other_identifiers( File.read( "spec/fixtures/coffeetech.js" ), "//" )
-#     out.should_not match( /FOOBAR/ )
-#   end
-# end
-
-describe "#process" do
-
-  it "should process a complex file" do
-    output = Oreilly::Snippets.process( WRAPPED_BY_SOURCE )
-    output.should_not match( /MODULE_DEFINITION/ )
-    output.should_not match( /\/\/$/ )
+describe Oreilly::Snippets do
+  before( :all ) do
+    download_test_repository()
   end
   
-  it "should process a simple file" do
-    output = Oreilly::Snippets.process( TEMPLATE )
-    output.should match( /ABC/ )
-    output.should match( /DEF/ )
-    output.should match( /function factorial\(number\)/ )
-    output.should_not match( /BEGIN FACTORIAL_FUNC/ )
-    output.should_not match( /END FACTORIAL_FUNC/ ) 
-  end
+  describe "#parse" do
 
-  # NYI
-  # it "should remove all identifiers when processing" do
-  #   output = Oreilly::Snippets.process( LOTS_OF_IDENTIFIERS )
-  #   output.should_not match( /BEGIN/ )
-  # end
-  
-  describe "#git" do
-    it "should retrieve by SHA if specified" do
-      output = Oreilly::Snippets.process( WITH_SHA )
-      ORIGINAL_CONTENTS.strip.should == output.strip
+    it "should parse wrapped items" do
+      outputs = Oreilly::Snippets.parse( WRAPPED_BY_SOURCE )
+      output = outputs[0]
+      output[:filename].should == "spec/fixtures/coffeetech.js"
+      output[:language].should == "js"
+      output[:identifier].should == "MODULE_DEFINITION"
+    end
+    
+    it "should parse the file and extract the correct things" do
+      outputs = Oreilly::Snippets.parse( TEMPLATE )
+      output = outputs[0]
+      output[:filename].should == "spec/fixtures/factorial.js"
+      output[:language].should == "js"
+      output[:identifier].should == "FACTORIAL_FUNC"
+      output[:full].strip.should == FULL.strip
+    end
+
+    it "should get the SHA when specified" do
+      outputs = Oreilly::Snippets.parse( WITH_SHA )
+      output = outputs[0]
+      output[:sha].should == "c863f786f5959799d7c:test.js"
     end
   end
-  
+
+  # describe "#scrub_other_identifiers" do
+  #   it "should scrub everything that looks like an identifier" do
+  #     out = Oreilly::Snippets.scrub_other_identifiers( File.read( "spec/fixtures/coffeetech.js" ), "//" )
+  #     out.should_not match( /FOOBAR/ )
+  #   end
+  # end
+
+  describe "#process" do
+
+    it "should process a complex file" do
+      output = Oreilly::Snippets.process( WRAPPED_BY_SOURCE )
+      output.should_not match( /MODULE_DEFINITION/ )
+      output.should_not match( /\/\/$/ )
+    end
+    
+    it "should process a simple file" do
+      output = Oreilly::Snippets.process( TEMPLATE )
+      output.should match( /ABC/ )
+      output.should match( /DEF/ )
+      output.should match( /function factorial\(number\)/ )
+      output.should_not match( /BEGIN FACTORIAL_FUNC/ )
+      output.should_not match( /END FACTORIAL_FUNC/ ) 
+    end
+
+    # NYI
+    # it "should remove all identifiers when processing" do
+    #   output = Oreilly::Snippets.process( LOTS_OF_IDENTIFIERS )
+    #   output.should_not match( /BEGIN/ )
+    # end
+    
+    describe "#git" do
+      it "should retrieve by SHA if specified" do
+        output = Oreilly::Snippets.process( WITH_SHA )
+        # strip the whitespace, makes comparison easier..
+        out = output.gsub( /\s+/, '' )
+        original = ORIGINAL_CONTENTS.gsub( /\s+/, '' )
+        puts "#{out} vs. #{original}"
+        out.should == original
+      end
+    end
+    
+  end
 end

@@ -13,9 +13,9 @@ module Oreilly
       if sha
         # Use the filename to change into the directory and use git-show
         cwd = Dir.pwd
-        Dir.chdir spec
+        Dir.chdir spec if spec
         contents = `git show #{sha}`
-        Dir.chdir cwd
+        Dir.chdir cwd if spec
       else
         contents = File.read( spec )
       end
