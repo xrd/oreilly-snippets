@@ -84,7 +84,7 @@ exact revision in the repository.
 Also, you can specify line numbers and use just certain lines within the file retrieved:
 
 ```
-[filename="../../github.js.test", language="js", sha="8e05a916fe0b1a9d3e:coffeetech.js:1..5"]
+[filename="../../github.js.test", language="js", sha="8e05a916fe0b1a9d3e:coffeetech.js, lines="1..5"]
 ```
 
 NB: This format of snippets is not currently compatible with Atlas
@@ -116,6 +116,25 @@ The file structure I use for this:
   config.ru. 
 * Use the live-reload plugin for Chrome:
   https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei
+
+It looks like this:
+
+```
+# Files which have been processed by oreilly-snippets and 
+# have regulard [source,javascript] style code blocks
+chapter1.asciidoc 
+chapter2.asciidoc
+# Files with the exact same name which have the oreilly-snippets
+# code includes. These are the files I edit.
+/pre/chapter1.asciidoc
+/pre/chapter2.asciidoc
+# The rendered HTML files. I open these in my browser and the live-reload
+# plugin reloads once I edit anything in the /pre directory.
+chapter1.asciidoc.html
+chapter2.asciidoc.html
+```
+
+Here is the `Guardfile`
 
 ```
 require 'asciidoctor'

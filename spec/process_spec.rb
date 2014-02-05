@@ -14,7 +14,7 @@ snippet~~~~
 END
 
 WITH_SHA_LINE_NUMBERS = <<END
-[filename="#{ROOT}", language="js", sha="c863f786f5959799d7c:test.js:1..3"]
+[filename="#{ROOT}", language="js", sha="c863f786f5959799d7c:test.js" lines="1..3"]
 snippet~~~~
 Put any descriptive text you want here. It will be replaced with the
 snippet~~~~
@@ -167,7 +167,7 @@ describe Oreilly::Snippets do
         original = `git show c863f786f5959799d7c11312a7ba1d603ff16339:test.js`
         Dir.chdir cwd
         lines = original.split /\n/
-        original = lines[1..3].join "\n"
+        original = lines[2..4].join "\n"
         output.strip.should == original.strip
       end
     end

@@ -8,19 +8,13 @@ COMMENTS = {
 module Oreilly
   module Snippets
 
-    def self.get_content_from_file( spec, identifier, language, sha=nil )
+    def self.get_content_from_file( spec, identifier, language, sha=nil, numbers=nil )
       contents = nil
       line_numbers = nil
 
       if sha
-
-        if sha.count( ":" ) > 1
-          # Strip off the line numbers and use them later
-          first = sha.index ":"
-          second = (sha.index ":", first+1)+1
-          numbers = sha[second..-1]
-          sae = numbers.split( ".." ).map { |d| Integer(d) }
-          sha = sha[0..second-2]
+        if numbers
+          sae = numbers.split( ".." ).map { |d| Integer(d)+1 }
           line_numbers = [sae[0], sae[1]]
         end
         # Use the filename to change into the directory and use git-show
@@ -28,7 +22,6 @@ module Oreilly
         Dir.chdir spec if spec
         contents = `git show #{sha}`
         Dir.chdir cwd if spec
-        
       else
         contents = File.read( spec )
       end
@@ -62,7 +55,7 @@ module Oreilly
       rv = input
       if snippets and snippets.length > 0 
         snippets.each do |s|
-          content = get_content_from_file( s[:filename], s[:identifier], s[:language], s[:sha] )
+          content = get_content_from_file( s[:filename], s[:identifier], s[:language], s[:sha], s[:lines] )
           rv = rv.gsub( s[:full], content )
         end
       end
