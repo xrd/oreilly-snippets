@@ -87,6 +87,16 @@ Also, you can specify line numbers and use just certain lines within the file re
 [filename="../../github.js.test", language="js", sha="8e05a916fe0b1a9d3e:coffeetech.js, lines="1..5"]
 ```
 
+If you want to use a placeholder to remind you to put the correct
+content in later once you have made the  correct commit, use "xxx" as
+the sha hash.
+
+```
+[filename="../../github.js.test", language="js", sha="8e05a916fe0b1a9d3e:coffeetech.js, lines="1..5"]
+```
+
+This will get replaced with `PLACEHOLDER TEXT, UPDATE WITH CORRECT SHA HASH`.
+
 NB: This format of snippets is not currently compatible with Atlas
 from O'Reilly. However, you can always process the snippet and write
 out a normal Asciidoc file, a file which will be compatible with
