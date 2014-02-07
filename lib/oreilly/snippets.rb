@@ -11,17 +11,23 @@ module Oreilly
     def self.get_content_from_file( spec, identifier, language, sha=nil, numbers=nil )
       contents = nil
       line_numbers = nil
+      error = false
 
       if sha
-        if numbers
-          sae = numbers.split( ".." ).map { |d| Integer(d)+1 }
-          line_numbers = [sae[0], sae[1]]
+        if sha[0..2].eql? "xxx"
+          contents = "PLACEHOLDER TEXT, UPDATE WITH CORRECT SHA HASH"
+        else
+          if numbers
+            sae = numbers.split( ".." ).map { |d| Integer(d)+1 }
+            line_numbers = [sae[0], sae[1]]
+          end
+          # Use the filename to change into the directory and use git-show
+          cwd = Dir.pwd
+          Dir.chdir spec if spec
+          contents = `git show #{sha}`
+          error = true unless contents
+          Dir.chdir cwd if spec
         end
-        # Use the filename to change into the directory and use git-show
-        cwd = Dir.pwd
-        Dir.chdir spec if spec
-        contents = `git show #{sha}`
-        Dir.chdir cwd if spec
       else
         contents = File.read( spec )
       end
@@ -39,6 +45,7 @@ module Oreilly
         rv = contents
       end
 
+      rv = "INVALID SNIPPET, WARNING" if error
       # rv = scrub_other_identifiers( contents, comments )
       rv
     end

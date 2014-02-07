@@ -20,6 +20,13 @@ Put any descriptive text you want here. It will be replaced with the
 snippet~~~~
 END
 
+WITH_PLACEHOLDER_SHA = <<END
+[filename="#{ROOT}", language="js", sha="xxx:test.js"]
+snippet~~~~
+Put any descriptive text you want here. It will be replaced with the
+snippet~~~~
+END
+
 ORIGINAL_CONTENTS = <<END
 var mod = angular.module( 'coffeetech', [] )
 mod.controller( 'ShopsCtrl', function( $scope ) {
@@ -170,7 +177,14 @@ describe Oreilly::Snippets do
         original = lines[2..4].join "\n"
         output.strip.should == original.strip
       end
+
+      it "should indicate placeholder if using xxx as the sha" do
+        output = Oreilly::Snippets.process( WITH_PLACEHOLDER_SHA )
+        output.should match( /PLACEHOLDER/ )
+      end
     end
+
+
     
   end
 end
