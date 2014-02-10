@@ -87,12 +87,14 @@ Also, you can specify line numbers and use just certain lines within the file re
 [filename="../../github.js.test", language="js", sha="8e05a916fe0b1a9d3e:coffeetech.js, lines="1..5"]
 ```
 
+This is equivalent to a range in ruby like `[0..4]`. So, we use human indexes, which are converted to zero-based numbering.
+
 If you want to use a placeholder to remind you to put the correct
 content in later once you have made the  correct commit, use "xxx" as
 the sha hash.
 
 ```
-[filename="../../github.js.test", language="js", sha="8e05a916fe0b1a9d3e:coffeetech.js, lines="1..5"]
+[filename="../../github.js.test", language="js", sha="xxx:coffeetech.js, lines="1..5"]
 ```
 
 This will get replaced with `PLACEHOLDER TEXT, UPDATE WITH CORRECT SHA HASH`.
