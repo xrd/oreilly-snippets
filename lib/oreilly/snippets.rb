@@ -18,7 +18,7 @@ module Oreilly
           contents = "PLACEHOLDER TEXT, UPDATE WITH CORRECT SHA HASH"
         else
           if numbers
-            sae = numbers.split( ".." ).map { |d| Integer(d)+1 }
+            sae = numbers.split( ".." ).map { |d| Integer(d)-1 }
             line_numbers = [sae[0], sae[1]]
           end
           # Use the filename to change into the directory and use git-show

@@ -174,7 +174,7 @@ describe Oreilly::Snippets do
         original = `git show c863f786f5959799d7c11312a7ba1d603ff16339:test.js`
         Dir.chdir cwd
         lines = original.split /\n/
-        original = lines[2..4].join "\n"
+        original = lines[0..2].join "\n"
         output.strip.should == original.strip
       end
 
