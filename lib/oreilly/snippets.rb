@@ -2,25 +2,27 @@ require "oreilly/snippets/version"
 
 COMMENTS = {
   :js => "\/\/",
-  :ruby => "#"
+  :ruby => "#",
+  :python => "#"
 }
 
 module Oreilly
   module Snippets
 
-    def self.get_content_from_file( spec, identifier, language, sha=nil, numbers=nil )
+    def self.get_content_from_file( spec, identifier, language, sha=nil, numbers=nil, flatten=false )
       contents = nil
       line_numbers = nil
       error = false
 
+      if numbers
+        sae = numbers.split( ".." ).map { |d| Integer(d)-1 }
+        line_numbers = [sae[0], sae[1]]
+      end
+      
       if sha
         if sha[0..2].eql? "xxx"
           contents = "PLACEHOLDER TEXT, UPDATE WITH CORRECT SHA HASH"
         else
-          if numbers
-            sae = numbers.split( ".." ).map { |d| Integer(d)-1 }
-            line_numbers = [sae[0], sae[1]]
-          end
           # Use the filename to change into the directory and use git-show
           cwd = Dir.pwd
           Dir.chdir spec if spec
@@ -33,7 +35,9 @@ module Oreilly
       end
 
       # If line numbers are there, provide only that content
-      contents = contents.split( /\n/ )[line_numbers[0]..line_numbers[1]].join( "\n" ) if line_numbers
+      if line_numbers
+        contents = contents.split( /\n/ )[line_numbers[0]..line_numbers[1]].join( "\n" )
+      end
       
       rv = nil
       if identifier
@@ -45,11 +49,35 @@ module Oreilly
         rv = contents
       end
 
+      if flatten
+        rv = self.flatten_it( rv )
+      end
+
       rv = "INVALID SNIPPET, WARNING" if error
       # rv = scrub_other_identifiers( contents, comments )
       rv
     end
 
+    def self.flatten_it( content ) 
+      # find the smallest indent level, and then strip that off the beginning of all lines
+      smallest = nil
+      lines = content.split "\n"
+      lines.each do |l|
+        if l =~ /^(\s+)/
+          if smallest
+            if $1.length < smallest.length
+              smallest = $1
+            end
+          else
+            smallest = $1
+          end
+        end
+      end
+
+      replaced = content.gsub( /^#{smallest}/, '' )
+      replaced
+    end
+    
     def self.scrub_other_identifiers( s, comments )
       puts s
       re = /#{comments} BEGIN \S+\n(.*)\n#{comments} END \S+\n/m
@@ -62,7 +90,7 @@ module Oreilly
       rv = input
       if snippets and snippets.length > 0 
         snippets.each do |s|
-          content = get_content_from_file( s[:filename], s[:identifier], s[:language], s[:sha], s[:lines] )
+          content = get_content_from_file( s[:filename], s[:identifier], s[:language], s[:sha], s[:lines], s[:flatten] )
           rv = rv.gsub( s[:full], content )
         end
       end
@@ -78,7 +106,7 @@ module Oreilly
         m[0].scan( /([^=\[,\s]*)="([^"]*)"/ ) do |kv|
           match[kv[0].to_sym] = kv[1]
         end
-        match[:full] = full.strip
+        match[:full] = full
         output << match
       end
       output
