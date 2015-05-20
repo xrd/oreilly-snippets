@@ -99,6 +99,40 @@ the sha hash.
 
 This will get replaced with `PLACEHOLDER TEXT, UPDATE WITH CORRECT SHA HASH`.
 
+You can specify `flatten=true` and oreilly-snippets will flatten out
+indentation. For example, if you are including a snippet python
+content of python content, you might not want to keep the indentation
+level as it is in the file, but display the content "flattened" to the
+smallest indentation level. 
+
+For example, imagine this content:
+
+```
+def barfoo():
+    print "barfoo"
+    if someVar == "someVar"
+        if anotherVar == "anotherVar"       
+            if thirdVar == "thirdVar" 
+                print( "all of them" )
+```
+
+Then, imagine if you take the snippet from lines 4-6. You probably
+don't want to display the snippet like this:
+
+```
+        if anotherVar == "anotherVar"       
+            if thirdVar == "thirdVar" 
+                print( "all of them" )
+```
+
+You probably want it like this:
+
+```
+if anotherVar == "anotherVar"       
+    if thirdVar == "thirdVar" 
+        print( "all of them" )
+```
+
 NB: This format of snippets is not currently compatible with Atlas
 from O'Reilly. However, you can always process the snippet and write
 out a normal Asciidoc file, a file which will be compatible with
