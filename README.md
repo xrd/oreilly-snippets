@@ -69,6 +69,8 @@ mod.factory( 'Github', function() {
 
 ### Special additions to snippets
 
+#### Retrieve content from the local git repository
+
 You can also use syntax like this to pull from a specific commit in
 your git repository:
 
@@ -81,6 +83,8 @@ directory, then grab the file at the specific SHA hash. This means you
 can write code inside a repository, and add a snippet pointing to that
 exact revision in the repository.
 
+#### Line Numbers
+
 Also, you can specify line numbers and use just certain lines within the file retrieved:
 
 ```
@@ -88,6 +92,8 @@ Also, you can specify line numbers and use just certain lines within the file re
 ```
 
 This is equivalent to a range in ruby like `[0..4]`. So, we use human indexes, which are converted to zero-based numbering.
+
+#### Placeholders for future SHA hashes
 
 If you want to use a placeholder to remind you to put the correct
 content in later once you have made the  correct commit, use "xxx" as
@@ -98,6 +104,8 @@ the sha hash.
 ```
 
 This will get replaced with `PLACEHOLDER TEXT, UPDATE WITH CORRECT SHA HASH`.
+
+#### Flattening Identation
 
 You can specify `flatten=true` and oreilly-snippets will flatten out
 indentation. For example, if you are including a snippet python
