@@ -141,6 +141,8 @@ if anotherVar == "anotherVar"
         print( "all of them" )
 ```
 
+#### Incompatibilities with Atlas from O'Reilly
+
 NB: This format of snippets is not currently compatible with Atlas
 from O'Reilly. However, you can always process the snippet and write
 out a normal Asciidoc file, a file which will be compatible with
