@@ -141,6 +141,9 @@ if anotherVar == "anotherVar"
         print( "all of them" )
 ```
 
+If you want the default to be to flatten (avoiding setting it each
+snippet declaration), you can set that using the config method: `Oreilly::Snippets.config( flatten: true )` 
+
 #### Incompatibilities with Atlas from O'Reilly
 
 NB: This format of snippets is not currently compatible with Atlas

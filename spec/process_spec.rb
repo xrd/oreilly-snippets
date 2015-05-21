@@ -46,6 +46,14 @@ specified code snippet when you build ebook outputs
 snippet~~~~
 END
 
+FOR_FLATTENING = <<END
+[filename="spec/fixtures/factorial.js", language="js", lines="6..9"]
+snippet~~~~
+Put any descriptive text you want here. It will be replaced with the
+specified code snippet when you build ebook outputs
+snippet~~~~
+END
+
 TEMPLATE = <<END
 
 ABC
@@ -91,6 +99,14 @@ Put any descriptive text you want here. It will be replaced with the
 specified code snippet when you build ebook outputs
 snippet~~~~
 END
+
+# Look at this: http://stackoverflow.com/questions/3772864/how-do-i-remove-leading-whitespace-chars-from-ruby-heredoc
+
+# class String
+#   def unindent 
+#     gsub(/^#{scan(/^\s*/).min_by{|l|l.length}}/, "")
+#   end
+# end
 
 FLATTEN_WITH_TABS =<<END
 [filename="spec/fixtures/with_tabs.rb", language="ruby", flatten="true", lines="1..3"]
@@ -173,9 +189,19 @@ describe Oreilly::Snippets do
 
       it "should not flatten when indentation level is zero" do
         output = Oreilly::Snippets.process( FLATTEN_NO_LINE_NUMBERS )
-        output
+        # remove one newline, consequence of embedding inside a template, it adds a newline
+        output = output[0...-1]
+        output.should == @with_tabs
       end
       
+      it "should support flattening as a configuration option" do
+        Oreilly::Snippets.config( flatten: true )
+        output = Oreilly::Snippets.process( FOR_FLATTENING )
+        lines = output.split "\n"
+        lines[0][0].should_not match /\s/ # First line has no whitespace starting
+        lines[-1][0].should match /\s/ # Last line is not indented
+      end
+
       it "should support flattening with tabs" do
         output = Oreilly::Snippets.process( FLATTEN_WITH_TABS )
         output.should == @tabs_flattened
