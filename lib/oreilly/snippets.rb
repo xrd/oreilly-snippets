@@ -69,7 +69,7 @@ module Oreilly
       smallest = nil
       lines = content.split "\n"
       lines.each do |l|
-        if l =~ /^(\s+)/
+        if l =~ /^(\s*)\S/
           if smallest
             if $1.length < smallest.length
               smallest = $1
@@ -80,8 +80,8 @@ module Oreilly
         end
       end
 
-      replaced = content.gsub( /^#{smallest}/, '' )
-      replaced
+      content.gsub!( /^#{smallest}/, '' ) if smallest
+      content
     end
 
 
