@@ -6,12 +6,6 @@ COMMENTS = {
   :python => "#"
 }
 
-class String
-  def unindent
-    gsub(/^#{scan(/^\s*/).min_by{|l|l.length}}/, "")
-  end
-end
-
 module Oreilly
   module Snippets
 
@@ -36,11 +30,10 @@ module Oreilly
           contents = "PLACEHOLDER TEXT, UPDATE WITH CORRECT SHA HASH"
         else
           # Use the filename to change into the directory and use git-show
-          if spec
-            Dir.chdir spec do
-              contents = `git show #{sha}`
-              error = true unless contents
-            end
+          spec = "." unless spec
+          Dir.chdir spec do
+            contents = `git show #{sha}`
+            error = true unless contents
           end
         end
       else
@@ -63,13 +56,34 @@ module Oreilly
       end
 
       if flatten or @@_config[:flatten]
-        rv = rv.unindent()
+        rv = flatten_it( rv )
       end
 
       rv = "INVALID SNIPPET, WARNING" if error
       # rv = scrub_other_identifiers( contents, comments )
       rv
     end
+
+    def self.flatten_it( content ) 
+      # find the smallest indent level, and then strip that off the beginning of all lines
+      smallest = nil
+      lines = content.split "\n"
+      lines.each do |l|
+        if l =~ /^(\s+)/
+          if smallest
+            if $1.length < smallest.length
+              smallest = $1
+            end
+          else
+            smallest = $1
+          end
+        end
+      end
+
+      replaced = content.gsub( /^#{smallest}/, '' )
+      replaced
+    end
+
 
     def self.scrub_other_identifiers( s, comments )
       puts s
