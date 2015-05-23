@@ -108,10 +108,10 @@ This will get replaced with `PLACEHOLDER TEXT, UPDATE WITH CORRECT SHA HASH`.
 #### Flattening Identation
 
 You can specify `flatten=true` and oreilly-snippets will flatten out
-indentation. For example, if you are including a snippet python
-content of python content, you might not want to keep the indentation
-level as it is in the file, but display the content "flattened" to the
-smallest indentation level. 
+indentation. For example, if you are including a snippet of python
+content, you might not want to keep the indentation level as it is in
+the file, but display the content "flattened" to the smallest
+indentation level.
 
 For example, imagine this content:
 
