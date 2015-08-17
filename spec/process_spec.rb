@@ -54,6 +54,14 @@ specified code snippet when you build ebook outputs
 snippet~~~~
 END
 
+DONT_USE_JAVA_FOR_FLATTENING = <<END
+[filename="spec/fixtures/factorial.java", language="java", lines="3..5"]
+snippet~~~~
+Put any descriptive text you want here. It will be replaced with the
+specified code snippet when you build ebook outputs
+snippet~~~~
+END
+
 TEMPLATE = <<END
 
 ABC
@@ -200,6 +208,17 @@ describe Oreilly::Snippets do
         lines = output.split "\n"
         lines[0][0].should_not match /\s/ # First line has no whitespace starting
         lines[-1][0].should match /\s/ # Last line is not indented
+      end
+
+      it "should not flatten if java is used and properly configured" do
+        string = <<END
+    public static void main( String[] args ) {
+      // Do something
+    }
+END
+        Oreilly::Snippets.config( flatten: true, flatten_exceptions: { java: true } )
+        output = Oreilly::Snippets.process( DONT_USE_JAVA_FOR_FLATTENING )
+        string.should eq( output )
       end
 
       it "should support flattening with tabs" do

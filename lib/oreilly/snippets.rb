@@ -55,13 +55,17 @@ module Oreilly
         rv = contents
       end
 
-      if flatten or @@_config[:flatten]
+      if ( flatten or @@_config[:flatten] ) and not flatten_exceptions( language )
         rv = flatten_it( rv )
       end
 
       rv = "INVALID SNIPPET, WARNING" if error
       # rv = scrub_other_identifiers( contents, comments )
       rv
+    end
+
+    def self.flatten_exceptions( language )
+      @@_config[:flatten_exceptions] and @@_config[:flatten_exceptions][language.to_sym]
     end
 
     def self.flatten_it( content ) 
