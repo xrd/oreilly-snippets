@@ -55,8 +55,9 @@ module Oreilly
         rv = contents
       end
 
+      # puts "Should we skip flattening? #{language}"
       unless skip_flattening( language )
-        if ( flatten or @@_config[:flatten] )
+        if flatten or @@_config[:flatten]
           rv = flatten_it( rv )
         end
       end
@@ -67,7 +68,8 @@ module Oreilly
     end
 
     def self.skip_flattening( language )
-      rv = ( !!@@_config[:skip_flattening] and !!@@_config[:skip_flattening][language.to_sym] ) 
+      rv = ( !!@@_config[:skip_flattening] and language and !!@@_config[:skip_flattening][language.to_sym] ) 
+      # rv = ( !!@@_config[:skip_flattening] and !!@@_config[:skip_flattening][language.to_sym] ) 
       # puts "Skipping flattening for #{language} / #{@@_config[:skip_flattening][language.to_sym]} / #{rv} / (#{@@_config[:skip_flattening].inspect})" if rv
       rv
     end

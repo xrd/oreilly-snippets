@@ -62,6 +62,14 @@ specified code snippet when you build ebook outputs
 snippet~~~~
 END
 
+NO_LANGUAGE_FOR_FLATTENING = <<END
+[filename="spec/fixtures/factorial.java", lines="3..5"]
+snippet~~~~
+Put any descriptive text you want here. It will be replaced with the
+specified code snippet when you build ebook outputs
+snippet~~~~
+END
+
 TEMPLATE = <<END
 
 ABC
@@ -219,6 +227,13 @@ END
         Oreilly::Snippets.config( flatten: true, skip_flattening: { java: true } )
         output = Oreilly::Snippets.process( DONT_USE_JAVA_FOR_FLATTENING )
         string.should eq( output )
+      end
+
+      it "should not crash when flattening if no language is specified" do
+        Oreilly::Snippets.config( flatten: true, skip_flattening: { java: true } )
+        lambda {
+          Oreilly::Snippets.process( NO_LANGUAGE_FOR_FLATTENING )
+        }.should_not raise_error()
       end
 
       it "should support flattening with tabs" do
