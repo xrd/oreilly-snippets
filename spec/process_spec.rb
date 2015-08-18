@@ -216,7 +216,7 @@ describe Oreilly::Snippets do
       // Do something
     }
 END
-        Oreilly::Snippets.config( flatten: true, flatten_exceptions: { java: true } )
+        Oreilly::Snippets.config( flatten: true, skip_flattening: { java: true } )
         output = Oreilly::Snippets.process( DONT_USE_JAVA_FOR_FLATTENING )
         string.should eq( output )
       end

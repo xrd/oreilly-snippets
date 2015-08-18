@@ -144,8 +144,7 @@ if anotherVar == "anotherVar"
 If you want the default to be to flatten (avoiding setting it each
 snippet declaration), you can set that using the config method: `Oreilly::Snippets.config( flatten: true )` 
 
-At the moment, flattening does not work perfectly for Java files. You can ignore java with `Oreilly::Snippets.config( flatten: true, flatten_exceptions: { java: true } )` 
-
+At the moment, flattening does not work perfectly for Java files. You can ignore java with `Oreilly::Snippets.config( flatten: true, skip_flattening: { java: true } )` 
 #### Incompatibilities with Atlas from O'Reilly
 
 NB: This format of snippets is not currently compatible with Atlas

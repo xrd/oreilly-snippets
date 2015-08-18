@@ -55,8 +55,10 @@ module Oreilly
         rv = contents
       end
 
-      if ( flatten or @@_config[:flatten] ) and not flatten_exceptions( language )
-        rv = flatten_it( rv )
+      unless skip_flattening( language )
+        if ( flatten or @@_config[:flatten] )
+          rv = flatten_it( rv )
+        end
       end
 
       rv = "INVALID SNIPPET, WARNING" if error
@@ -64,8 +66,10 @@ module Oreilly
       rv
     end
 
-    def self.flatten_exceptions( language )
-      @@_config[:flatten_exceptions] and @@_config[:flatten_exceptions][language.to_sym]
+    def self.skip_flattening( language )
+      rv = ( !!@@_config[:skip_flattening] and !!@@_config[:skip_flattening][language.to_sym] ) 
+      # puts "Skipping flattening for #{language} / #{@@_config[:skip_flattening][language.to_sym]} / #{rv} / (#{@@_config[:skip_flattening].inspect})" if rv
+      rv
     end
 
     def self.flatten_it( content ) 
