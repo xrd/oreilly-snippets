@@ -145,12 +145,21 @@ If you want the default to be to flatten (avoiding setting it each
 snippet declaration), you can set that using the config method: `Oreilly::Snippets.config( flatten: true )` 
 
 At the moment, flattening does not work perfectly for Java files. You can ignore java with `Oreilly::Snippets.config( flatten: true, skip_flattening: { java: true } )` 
+
 #### Incompatibilities with Atlas from O'Reilly
 
 NB: This format of snippets is not currently compatible with Atlas
 from O'Reilly. However, you can always process the snippet and write
 out a normal Asciidoc file, a file which will be compatible with
 Atlas. See below for an example using Guard.
+
+### Normalizing Callouts
+
+If you use callouts, you might run into a situation where you write 10
+of them inside a snippet, and then you break that snippet into
+two. Your second snippet will have callouts 6-10. If you specify
+`normcallouts="true"` in your snippet, this module will rewrite those to
+start from 1. 
 
 ### Using with Guard and live-reload
 

@@ -15,7 +15,7 @@ module Oreilly
       @@_config.merge!( opts )
     end
 
-    def self.get_content_from_file( spec, identifier, language, sha=nil, numbers=nil, flatten=false )
+    def self.get_content_from_file( spec, identifier, language, sha=nil, numbers=nil, flatten=false, normcallouts=false )
       contents = nil
       line_numbers = nil
       error = false
@@ -62,8 +62,19 @@ module Oreilly
         end
       end
 
+      if normcallouts
+        rv = normalize_callouts( rv )
+      end
+
       rv = "INVALID SNIPPET, WARNING" if error
       # rv = scrub_other_identifiers( contents, comments )
+      rv
+    end
+
+    def self.normalize_callouts( rv )
+      # Find something that looks like comment character + whitespace + < + number + >
+      index = 0
+      rv.gsub!( /([\/#]) <\d+>/ ) { |c| index += 1; "#{$1} <#{index}>" }
       rv
     end
 
@@ -107,7 +118,7 @@ module Oreilly
       rv = input
       if snippets and snippets.length > 0 
         snippets.each do |s|
-          content = get_content_from_file( s[:filename], s[:identifier], s[:language], s[:sha], s[:lines], s[:flatten] )
+          content = get_content_from_file( s[:filename], s[:identifier], s[:language], s[:sha], s[:lines], s[:flatten], s[:normcallouts] )
           rv = rv.gsub( s[:full], content )
         end
       end

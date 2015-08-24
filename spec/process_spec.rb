@@ -37,6 +37,28 @@ snippet~~~~
 
 END
 
+NORMALIZE_CALLOUTS_JS = <<"END"
+[filename="spec/fixtures/normalize_callouts.js", normcallouts="true"]
+snippet~~~~
+...
+snippet~~~~
+END
+
+HONEYPOT_NORMALIZE_CALLOUTS = <<"END"
+[filename="spec/fixtures/normalize_callouts.honey", normcallouts="true"]
+snippet~~~~
+...
+snippet~~~~
+END
+
+
+NORMALIZE_CALLOUTS_RB = <<"END"
+[filename="spec/fixtures/normalize_callouts.rb", normcallouts="true"]
+snippet~~~~
+...
+snippet~~~~
+END
+
 
 FULL = <<END
 [filename="spec/fixtures/factorial.js", language="js", identifier="FACTORIAL_FUNC"]
@@ -193,6 +215,25 @@ describe Oreilly::Snippets do
       output.should match( /function factorial\(number\)/ )
       output.should_not match( /BEGIN FACTORIAL_FUNC/ )
       output.should_not match( /END FACTORIAL_FUNC/ ) 
+    end
+
+    describe "#normcallouts" do
+      it "should normalize callouts" do
+        output = Oreilly::Snippets.process( NORMALIZE_CALLOUTS_JS )
+        output.should match( /<1>/ )        
+        output.should_not match( /<3>/ )
+      end
+
+      it "should normalize callouts with alternative comments" do
+        output = Oreilly::Snippets.process( NORMALIZE_CALLOUTS_RB )
+        output.should match( /<1>/ )        
+        output.should_not match( /<3>/ )
+      end
+
+      it "should not mistakenly normalize callouts" do
+        output = Oreilly::Snippets.process( HONEYPOT_NORMALIZE_CALLOUTS )
+        output.should match( /<2>/ )
+      end
     end
 
     describe "#flatten" do
