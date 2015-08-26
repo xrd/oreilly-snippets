@@ -37,6 +37,28 @@ snippet~~~~
 
 END
 
+STRIP_CALLOUTS_JS = <<"END"
+[filename="spec/fixtures/normalize_callouts.js", callouts=""]
+snippet~~~~
+...
+snippet~~~~
+END
+
+ADD_CALLOUTS_JS = <<"END"
+[filename="spec/fixtures/normalize_callouts.js", callouts="1,2,3"]
+snippet~~~~
+...
+snippet~~~~
+END
+
+REALLY_LONG_CALLOUTS_JS = <<"END"
+[filename="spec/fixtures/normalize_callouts_long.js", callouts="1,10,15"]
+snippet~~~~
+...
+snippet~~~~
+END
+
+
 NORMALIZE_CALLOUTS_JS = <<"END"
 [filename="spec/fixtures/normalize_callouts.js", normcallouts="true"]
 snippet~~~~
@@ -50,7 +72,6 @@ snippet~~~~
 ...
 snippet~~~~
 END
-
 
 NORMALIZE_CALLOUTS_RB = <<"END"
 [filename="spec/fixtures/normalize_callouts.rb", normcallouts="true"]
@@ -217,11 +238,40 @@ describe Oreilly::Snippets do
       output.should_not match( /END FACTORIAL_FUNC/ ) 
     end
 
+    describe "#callouts" do
+      it "should strip callouts completely" do
+        output = Oreilly::Snippets.process( STRIP_CALLOUTS_JS )
+        output.should_not match( /<\d+>/ )        
+      end
+
+      it "should add callouts" do
+        output = Oreilly::Snippets.process( ADD_CALLOUTS_JS )
+        lines = output.split /\n/ 
+        lines[0].should match( /<1>/ )        
+        lines[1].should match( /<2>/ )        
+        lines[2].should match( /<3>/ )        
+      end
+
+      it "should add callouts into a long file" do
+        output = Oreilly::Snippets.process( REALLY_LONG_CALLOUTS_JS )
+        lines = output.split /\n/ 
+        lines[0].should match( /<1>/ )        
+        lines[9].should match( /<2>/ )        
+        lines[14].should match( /<3>/ )        
+      end
+
+      it "should add callouts using a default comment" do
+        output = Oreilly::Snippets.process( REALLY_LONG_CALLOUTS_JS )
+        lines = output.split /\n/ 
+        lines[0].should match( /\/\/ <1>/ )        
+      end
+    end
+
     describe "#normcallouts" do
       it "should normalize callouts" do
         output = Oreilly::Snippets.process( NORMALIZE_CALLOUTS_JS )
         output.should match( /<1>/ )        
-        output.should_not match( /<3>/ )
+        output.should_not match( /<12>/ )
       end
 
       it "should normalize callouts with alternative comments" do

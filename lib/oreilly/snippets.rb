@@ -15,7 +15,17 @@ module Oreilly
       @@_config.merge!( opts )
     end
 
-    def self.get_content_from_file( spec, identifier, language, sha=nil, numbers=nil, flatten=false, normcallouts=false )
+    def self.get_content_from_file( s )
+
+      spec = s[:filename]
+      identifier =  s[:identifier]
+      language = s[:language]
+      sha = s[:sha]
+      numbers = s[:lines]
+      flatten = s[:flatten]
+      normcallouts = s[:normcallouts] 
+      callouts = s[:callouts]
+
       contents = nil
       line_numbers = nil
       error = false
@@ -62,7 +72,9 @@ module Oreilly
         end
       end
 
-      if normcallouts
+      if callouts
+        rv = process_callouts( rv, callouts )
+      elsif normcallouts
         rv = normalize_callouts( rv )
       end
 
@@ -71,10 +83,41 @@ module Oreilly
       rv
     end
 
+    def self.process_callouts( input, callouts )
+      rv = nil
+      # Strip them out and figure out the comment character
+      comment_character = nil
+      rv = input.gsub( /([#\/]\/?) <\d+>/ ) { |c| comment_character = $1; '' }
+
+      unless comment_character
+        # OK, we need to scan for it and hope to figure it out
+        if rv =~ /\/\/[\/]+$/
+          comment_character = '/'
+        elsif rv =~ /#[^#]+$/
+          comment_character = '#'
+        end
+      end
+
+      unless comment_character
+        comment_character = '//'
+      end
+
+      unless callouts.eql? ""
+        list = callouts.split /,/
+        lines = rv.split /\n/
+        list.each_with_index do |c,i|
+          index = c.to_i - 1
+          lines[index] += "#{comment_character} <#{i+1}>" if lines.length > index and index >= 0
+        end
+        rv = lines.join "\n"
+      end
+      rv
+    end
+
     def self.normalize_callouts( rv )
       # Find something that looks like comment character + whitespace + < + number + >
       index = 0
-      rv.gsub!( /([\/#]) <\d+>/ ) { |c| index += 1; "#{$1} <#{index}>" }
+      rv.gsub!( /([\/#]) <\d*>/ ) { |c| index += 1; "#{$1} <#{index}>" }
       rv
     end
 
@@ -107,7 +150,7 @@ module Oreilly
 
 
     def self.scrub_other_identifiers( s, comments )
-      puts s
+      # puts s
       re = /#{comments} BEGIN \S+\n(.*)\n#{comments} END \S+\n/m
       s.gsub!( re, $1 )
       s
@@ -118,7 +161,7 @@ module Oreilly
       rv = input
       if snippets and snippets.length > 0 
         snippets.each do |s|
-          content = get_content_from_file( s[:filename], s[:identifier], s[:language], s[:sha], s[:lines], s[:flatten], s[:normcallouts] )
+          content = get_content_from_file( s ) #  s[:filename], s[:identifier], s[:language], s[:sha], s[:lines], s[:flatten], s[:normcallouts] )
           rv = rv.gsub( s[:full], content )
         end
       end
