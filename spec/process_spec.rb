@@ -6,6 +6,14 @@ TEST_REPO = "oreilly-snippets-sample-content"
 GITHUB_REPO = "https://github.com/xrd/#{TEST_REPO}.git"
 ROOT = File.join "spec", TEST_REPO
 
+WITH_DIRECTORY_AND_SHA = <<END
+[filename="../oreilly-snippets", language="js", sha="2f35461ff68c92c2e554c953:spec/fixtures/factorial.js"]
+snippet~~~~
+Put any descriptive text you want here. It will be replaced with the
+snippet~~~~
+END
+
+
 WITH_SHA = <<END
 [filename="#{ROOT}", language="js", sha="c863f786f5959799d7c:test.js"]
 snippet~~~~
@@ -50,6 +58,14 @@ snippet~~~~
 ...
 snippet~~~~
 END
+
+NO_SPACED_CALLOUTS_JS = <<"END"
+[filename="spec/fixtures/add-callouts-no-space.js", callouts="1"]
+snippet~~~~
+...
+snippet~~~~
+END
+
 
 REALLY_LONG_CALLOUTS_JS = <<"END"
 [filename="spec/fixtures/normalize_callouts_long.js", callouts="1,10,15"]
@@ -265,6 +281,13 @@ describe Oreilly::Snippets do
         lines = output.split /\n/ 
         lines[0].should match( /\/\/ <1>/ )        
       end
+
+      it "should add callouts without a space character in between comment and callout" do
+        output = Oreilly::Snippets.process( NO_SPACED_CALLOUTS_JS )
+        lines = output.split /\n/ 
+        lines[0].should match( /\/\/ <1>/ )        
+        lines[1].should_not match( /\/\/<10>/ )        
+      end
     end
 
     describe "#normcallouts" do
@@ -352,7 +375,7 @@ END
         Dir.chdir File.join( ROOT )
         original = `git show c863f786f5959799d7c11312a7ba1d603ff16339:test.js`
         Dir.chdir cwd
-        output.strip.should == original.strip
+        output.rstrip.should == original.rstrip
       end
 
       it "should retrieve by SHA and give us only certain lines" do
@@ -364,6 +387,16 @@ END
         lines = original.split /\n/
         original = lines[0..2].join( "\n" ) + "\n"
         output.should == original
+      end
+
+      it "should parse directory specifications" do
+        output = Oreilly::Snippets.process( WITH_DIRECTORY_AND_SHA )
+        original = nil
+        path = ENV['REPO_NAME'] || "../oreilly-snippets"
+        Dir.chdir path do 
+          original = `git show 2f35461ff68c92c2e554c953:spec/fixtures/factorial.js`
+        end
+        output.should == ( original + "\n" )
       end
 
       it "should indicate placeholder if using xxx as the sha" do

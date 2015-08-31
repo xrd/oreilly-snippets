@@ -87,7 +87,7 @@ module Oreilly
       rv = nil
       # Strip them out and figure out the comment character
       comment_character = nil
-      rv = input.gsub( /([#\/]\/?) <\d+>/ ) { |c| comment_character = $1; '' }
+      rv = input.gsub( /([#\/]\/?) ?<\d+>/ ) { |c| comment_character = $1; '' }
 
       unless comment_character
         # OK, we need to scan for it and hope to figure it out
