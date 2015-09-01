@@ -24,6 +24,7 @@ module Oreilly
       numbers = s[:lines]
       flatten = s[:flatten]
       normcallouts = s[:normcallouts] 
+      callouts_prefix = s[:callouts_prefix]
       callouts = s[:callouts]
 
       contents = nil
@@ -73,7 +74,7 @@ module Oreilly
       end
 
       if callouts
-        rv = process_callouts( rv, callouts )
+        rv = process_callouts( rv, callouts, callouts_prefix )
       elsif normcallouts
         rv = normalize_callouts( rv )
       end
@@ -83,11 +84,10 @@ module Oreilly
       rv
     end
 
-    def self.process_callouts( input, callouts )
+    def self.process_callouts( input, callouts, comment_character = nil )
       rv = nil
       # Strip them out and figure out the comment character
-      comment_character = nil
-      rv = input.gsub( /([#\/]\/?) ?<\d+>/ ) { |c| comment_character = $1; '' }
+      rv = input.gsub( /([#\/]\/?) ?<\d+>/ ) { |c| comment_character ||= $1; '' }
 
       unless comment_character
         # OK, we need to scan for it and hope to figure it out

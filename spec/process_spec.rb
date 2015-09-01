@@ -66,7 +66,6 @@ snippet~~~~
 snippet~~~~
 END
 
-
 REALLY_LONG_CALLOUTS_JS = <<"END"
 [filename="spec/fixtures/normalize_callouts_long.js", callouts="1,10,15"]
 snippet~~~~
@@ -74,6 +73,12 @@ snippet~~~~
 snippet~~~~
 END
 
+CALLOUTS_PREFIX_JS = <<"END"
+[filename="spec/fixtures/normalize_callouts_long.js", callouts_prefix="#", callouts="1,10,15"]
+snippet~~~~
+...
+snippet~~~~
+END
 
 NORMALIZE_CALLOUTS_JS = <<"END"
 [filename="spec/fixtures/normalize_callouts.js", normcallouts="true"]
@@ -274,6 +279,14 @@ describe Oreilly::Snippets do
         lines[0].should match( /<1>/ )        
         lines[9].should match( /<2>/ )        
         lines[14].should match( /<3>/ )        
+      end
+
+      it "should add a prefix character to a callout to makes sure the code is runnable" do
+        output = Oreilly::Snippets.process( CALLOUTS_PREFIX_JS )
+        lines = output.split /\n/ 
+        lines[0].should match( /# <1>/ )        
+        lines[9].should match( /# <2>/ )        
+        lines[14].should match( /# <3>/ )        
       end
 
       it "should add callouts using a default comment" do
