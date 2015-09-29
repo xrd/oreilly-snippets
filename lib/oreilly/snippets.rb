@@ -111,6 +111,15 @@ module Oreilly
         end
         rv = lines.join "\n"
       end
+
+      if ENV['OREILLY_SNIPPETS_DEBUG_LONG_LINES']
+        rv.split( /\n/ ).each_with_index do |l,i|
+          if l.length > 70
+            raise "Line #{i+1} is too long: #{l.length} characters long"
+          end
+        end
+      end
+
       rv
     end
 

@@ -13,6 +13,13 @@ Put any descriptive text you want here. It will be replaced with the
 snippet~~~~
 END
 
+LONG_LINES = <<END
+[filename="../spec/fixtures/really_long_lines.rb"]
+snippet~~~~
+Put any descriptive text you want here. It will be replaced with the
+snippet~~~~
+END
+
 
 WITH_SHA = <<END
 [filename="#{ROOT}", language="js", sha="c863f786f5959799d7c:test.js"]
@@ -319,6 +326,15 @@ describe Oreilly::Snippets do
       it "should not mistakenly normalize callouts" do
         output = Oreilly::Snippets.process( HONEYPOT_NORMALIZE_CALLOUTS )
         output.should match( /<2>/ )
+      end
+    end
+
+    describe "#warnlonglines" do
+      it "should warn you if there is a really long line of code" do
+        ENV['OREILLY_SNIPPETS_DEBUG_LONG_LINES'] = "1"
+        lambda {
+          Oreilly::Snippets.process( LONG_LINES )
+        }.should raise_error
       end
     end
 
