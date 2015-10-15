@@ -25,7 +25,18 @@ module Oreilly
       flatten = s[:flatten]
       normcallouts = s[:normcallouts] 
       callouts_prefix = s[:callouts_prefix]
+      callouts_wrap = s[:callouts_wrap]
       callouts = s[:callouts]
+
+      if callouts_wrap
+        if callouts_prefix
+          raise "Cannot use both callout prefix and wrap together"
+        end
+
+        if -1 == callouts_wrap.index( '{x}' )
+          raise "Improper use of callouts: needs to be like '<!-- {x} -->' ('{x}' must be a placeholder)" 
+        end
+      end
 
       contents = nil
       line_numbers = nil
@@ -74,7 +85,7 @@ module Oreilly
       end
 
       if callouts
-        rv = process_callouts( rv, callouts, callouts_prefix )
+        rv = process_callouts( rv, callouts, callouts_prefix, callouts_wrap )
       elsif normcallouts
         rv = normalize_callouts( rv )
       end
@@ -84,7 +95,7 @@ module Oreilly
       rv
     end
 
-    def self.process_callouts( input, callouts, comment_character = nil )
+    def self.process_callouts( input, callouts, comment_character = nil, wrap = nil )
       rv = nil
       # Strip them out and figure out the comment character
       rv = input.gsub( /([#\/]\/?) ?<\d+>/ ) { |c| comment_character ||= $1; '' }
@@ -107,7 +118,17 @@ module Oreilly
         lines = rv.split /\n/
         list.each_with_index do |c,i|
           index = c.to_i - 1
-          lines[index] += "#{comment_character} <#{i+1}>" if lines.length > index and index >= 0
+
+          if lines.length > index and index >= 0
+            callout = nil
+            if wrap
+              callout = wrap.gsub( '{x}', "<#{i+1}>" )
+            else
+              callout = "#{comment_character} <#{i+1}>" 
+            end
+
+            lines[index] += callout
+          end
         end
         rv = lines.join "\n"
       end

@@ -87,6 +87,28 @@ snippet~~~~
 snippet~~~~
 END
 
+CALLOUTS_WRAP_AND_PREFIX_JS = <<"END"
+[filename="spec/fixtures/normalize_callouts_long.js", callouts_prefix="#", callouts_wrap="# {1} #", callouts="1,10,15"]
+snippet~~~~
+...
+snippet~~~~
+END
+
+CALLOUTS_WRAP_XML = <<"END"
+[filename="spec/fixtures/some.xml", callouts_wrap="<!-- {x} -->", callouts="1,2,3"]
+snippet~~~~
+...
+snippet~~~~
+END
+
+INVALID_CALLOUTS_WRAP_XML = <<"END"
+[filename="spec/fixtures/some.xml", callouts_wrap="<!-- no x! -->", callouts="1,2,3"]
+snippet~~~~
+...
+snippet~~~~
+END
+
+
 NORMALIZE_CALLOUTS_JS = <<"END"
 [filename="spec/fixtures/normalize_callouts.js", normcallouts="true"]
 snippet~~~~
@@ -295,6 +317,41 @@ describe Oreilly::Snippets do
         lines[9].should match( /# <2>/ )        
         lines[14].should match( /# <3>/ )        
       end
+
+      it "should add a prefix character to a callout to makes sure the code is runnable" do
+        output = Oreilly::Snippets.process( CALLOUTS_PREFIX_JS )
+        lines = output.split /\n/ 
+        lines[0].should match( /# <1>/ )        
+        lines[9].should match( /# <2>/ )        
+        lines[14].should match( /# <3>/ )        
+      end
+
+      it "should properly wrap callouts" do
+        output = Oreilly::Snippets.process( CALLOUTS_WRAP_XML )
+        lines = output.split /\n/ 
+        lines[0].should match( /<!-- <1> -->/ )        
+        lines[1].should match( /<!-- <2> -->/ )        
+        lines[2].should match( /<!-- <3> -->/ )        
+      end
+
+      it "should raise an error when prefix and wrap are used together for callouts" do
+        lambda {
+          output = Oreilly::Snippets.process( CALLOUTS_WRAP_AND_PREFIX_JS )
+        }.should raise_error
+      end
+
+      it "should raise an error when wrap is misued" do
+        lambda {
+          output = Oreilly::Snippets.process( INVALID_CALLOUTS_WRAP_JS )
+        }.should raise_error
+      end
+
+      it "should raise an error when wrap is misued" do
+        lambda {
+          output = Oreilly::Snippets.process( CALLOUTS_WRAP_AND_PREFIX_JS )
+        }.should raise_error
+      end
+
 
       it "should add callouts using a default comment" do
         output = Oreilly::Snippets.process( REALLY_LONG_CALLOUTS_JS )
